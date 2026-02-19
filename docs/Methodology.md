@@ -121,4 +121,4 @@ The methodology was validated through application to an AI-powered espionage det
 
 ## Citation
 
-**Sabaliauskaitė, G., Paskauskas, R. A., Bružė, E., Matulytė, R., & Lavišius, T.** (2026). Ontology-Based Regulatory Compliance Requirements Specification for Dual-Use AI Systems. *Open Research Europe* (forthcoming).
+**Sabaliauskaitė, G., Paskauskas, R. A., Bružė, E., Matulytė, R., & Lavišius, T.** (2026). Automated Regulatory Compliance for AI Systems in Security Domain: From the EU AI Act to Dual-Use Deployment Contexts. *Open Research Europe* (forthcoming).
