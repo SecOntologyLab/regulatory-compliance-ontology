@@ -8,7 +8,7 @@ This repository contains the **research artefacts** and **validation materials**
 
 ## Publication
 
-**Sabaliauskaitė, G., Paskauskas, R. A., Bružė, E., Matulytė, R., & Lavišius, T.** (2026). Automated Regulatory Compliance for AI Systems in Security Domain: From the EU AI Act to Dual-Use Deployment Contexts. *Open Research Europe* (forthcoming).
+**Sabaliauskaitė, G., Paskauskas, R. A., Bružė, E., Matulytė, R., & Lavišius, T.** (2026). Ontology-Based Regulatory Compliance Requirements Specification for Dual-Use AI Systems. *Open Research Europe* (forthcoming).
 
 ## Repository Contents
 
@@ -35,10 +35,10 @@ This repository contains the **research artefacts** and **validation materials**
 
 ### `/visualisations/` — Interactive Demonstrations
 
-| File | Description |
+| Demo | Description |
 | --- | --- |
-| `EPMwDC-Knowledge-Graph.html` | Knowledge graph visualisation (corresponds to Figure 2) |
-| `EPMwDC-Case-Study.html` | Espionage detection system component-to-requirement mapping |
+| [EPMwDC Knowledge Graph](https://secontologylab.github.io/regulatory-compliance-ontology/visualisations/EPMwDC-Knowledge-Graph.html) | Knowledge graph visualisation (corresponds to Figure 2) |
+| [EPMwDC Case Study](https://secontologylab.github.io/regulatory-compliance-ontology/visualisations/EPMwDC-Case-Study.html) | Espionage detection system component-to-requirement mapping |
 
 ### `/docs/` — Documentation
 
