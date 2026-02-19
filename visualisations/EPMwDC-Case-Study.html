@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EPMwDC Case Study — Espionage Detection System</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0e17;color:#c8d0de;min-height:100vh}
+#header{background:rgba(10,14,23,0.95);border-bottom:1px solid #1e2a3a;padding:16px 24px;position:sticky;top:0;z-index:20}
+#header h1{font-size:18px;color:#e2e8f0;font-weight:600}
+#header p{font-size:12px;color:#64748b;margin-top:4px}
+#main{display:flex;height:calc(100vh - 72px)}
+#arch-panel{flex:0 0 420px;padding:24px;overflow-y:auto;border-right:1px solid #1e2a3a}
+#req-panel{flex:1;padding:24px;overflow-y:auto}
+.section-title{font-size:13px;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;font-weight:600}
+
+/* Architecture diagram */
+.arch-diagram{position:relative;background:#0f1520;border:1px solid #1e2a3a;border-radius:10px;padding:20px;margin-bottom:20px}
+.component{border:2px solid #334155;border-radius:8px;padding:10px 14px;cursor:pointer;transition:all 0.2s;position:relative;margin-bottom:10px;background:#0f1520}
+.component:hover{border-color:#60a5fa;background:#111827}
+.component.selected{border-color:#3b82f6;background:#172040;box-shadow:0 0 16px rgba(59,130,246,0.2)}
+.component .c-name{font-size:13px;font-weight:600;color:#e2e8f0}
+.component .c-desc{font-size:11px;color:#64748b;margin-top:3px}
+.component .c-data{font-size:10px;color:#f59e0b;margin-top:4px;font-style:italic}
+.phase-badge{display:inline-block;font-size:9px;padding:2px 8px;border-radius:10px;margin-top:6px;font-weight:600}
+.phase-detect{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3)}
+.phase-notify{background:rgba(251,191,36,0.15);color:#fbbf24;border:1px solid rgba(251,191,36,0.3)}
+.phase-act{background:rgba(34,197,94,0.15);color:#4ade80;border:1px solid rgba(34,197,94,0.3)}
+.flow-arrow{text-align:center;color:#334155;font-size:20px;margin:4px 0;letter-spacing:4px}
+
+/* Requirements panel */
+.domain-tabs{display:flex;gap:8px;margin-bottom:16px}
+.domain-tab{padding:8px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #1e2a3a;background:#0f1520;color:#64748b;transition:all 0.2s}
+.domain-tab.active-civ{background:rgba(59,130,246,0.15);color:#60a5fa;border-color:#3b82f6}
+.domain-tab.active-def{background:rgba(239,68,68,0.15);color:#f87171;border-color:#ef4444}
+.domain-tab.active-both{background:rgba(168,85,247,0.15);color:#c084fc;border-color:#a855f7}
+.req-card{border:1px solid #1e2a3a;border-radius:8px;padding:14px;margin-bottom:10px;transition:all 0.2s;background:#0f1520}
+.req-card.highlight{border-color:#3b82f6;background:#111c30}
+.req-card.highlight-def{border-color:#ef4444;background:#1c1118}
+.req-id{font-size:11px;font-weight:700;font-family:monospace;margin-bottom:4px}
+.req-id.civ{color:#60a5fa}
+.req-id.def{color:#f87171}
+.req-name{font-size:13px;font-weight:600;color:#e2e8f0;margin-bottom:6px}
+.req-meta{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.req-tag{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:500}
+.tag-privacy{background:rgba(139,92,246,0.15);color:#a78bfa;border:1px solid rgba(139,92,246,0.3)}
+.tag-security{background:rgba(6,182,212,0.15);color:#22d3ee;border:1px solid rgba(6,182,212,0.3)}
+.tag-design{background:rgba(236,72,153,0.15);color:#f472b6;border:1px solid rgba(236,72,153,0.3)}
+.tag-usage{background:rgba(251,191,36,0.15);color:#fbbf24;border:1px solid rgba(251,191,36,0.3)}
+.req-source{font-size:11px;color:#94a3b8;margin-bottom:4px}
+.req-basis{font-size:11px;color:#64748b;line-height:1.5}
+.sub-reqs{margin-top:8px;padding-left:12px;border-left:2px solid #334155}
+.sub-req{font-size:11px;margin-bottom:6px}
+.sub-req .sub-id{color:#f97316;font-weight:600;font-family:monospace}
+.pattern-box{border:1px solid #1e2a3a;border-radius:8px;padding:14px;margin-bottom:12px;background:#0f1520}
+.pattern-box h4{font-size:12px;color:#e2e8f0;margin-bottom:6px}
+.pattern-box p{font-size:11px;color:#94a3b8;line-height:1.5}
+.pattern-icon{font-size:14px;margin-right:6px}
+
+/* Conflict table */
+.conflict-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:11px}
+.conflict-table th{text-align:left;color:#64748b;padding:6px 8px;border-bottom:1px solid #1e2a3a;font-weight:600}
+.conflict-table td{padding:6px 8px;border-bottom:1px solid #111827;color:#94a3b8}
+.conflict-table td:first-child{color:#e2e8f0;font-weight:500}
+
+#no-selection{text-align:center;padding:60px 20px;color:#475569}
+#no-selection .icon{font-size:48px;margin-bottom:16px}
+#no-selection p{font-size:13px;line-height:1.6}
+</style>
+</head>
+<body>
+<div id="header">
+  <h1>EPMwDC Case Study — AI-Powered Espionage Detection System</h1>
+  <p>Click a system component to view applicable regulatory requirements across civilian and defence domains</p>
+</div>
+<div id="main">
+  <div id="arch-panel">
+    <div class="section-title">System Architecture</div>
+    <div class="arch-diagram">
+      <div class="component" data-comp="monitor">
+        <div class="c-name">Screen / Monitor</div>
+        <div class="c-desc">Displays classified or confidential information</div>
+        <div class="c-data">Ethernet connection to AI system</div>
+        <span class="phase-badge phase-detect">DETECT</span>
+      </div>
+      <div class="flow-arrow">↕</div>
+      <div class="component" data-comp="camera">
+        <div class="c-name">USB Camera</div>
+        <div class="c-desc">Visual monitoring of the room</div>
+        <div class="c-data">Captures images of room occupants (potential biometric data)</div>
+        <span class="phase-badge phase-detect">DETECT</span>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="component" data-comp="ai">
+        <div class="c-name">AI Detection Module</div>
+        <div class="c-desc">Analyses video feed for unauthorised photography attempts</div>
+        <div class="c-data">Detects camera lenses / smartphone screens pointed at display</div>
+        <span class="phase-badge phase-detect">DETECT</span>
+      </div>
+      <div class="flow-arrow">↓ 5G</div>
+      <div class="component" data-comp="transmission">
+        <div class="c-name">5G Transmission Channel</div>
+        <div class="c-desc">Transmits alerts to remote monitoring station</div>
+        <div class="c-data">Images, confidence level, timestamp, screen content, location</div>
+        <span class="phase-badge phase-notify">NOTIFY</span>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="component" data-comp="monitoring">
+        <div class="c-name">Remote Monitoring Station</div>
+        <div class="c-desc">Receives alerts, stores images, enables access</div>
+        <div class="c-data">Multiple AI systems may report here simultaneously</div>
+        <span class="phase-badge phase-notify">NOTIFY</span>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="component" data-comp="personnel">
+        <div class="c-name">Dedicated Security Personnel</div>
+        <div class="c-desc">Review alerts and take response actions</div>
+        <div class="c-data">View captured images, make response decisions</div>
+        <span class="phase-badge phase-act">ACT</span>
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-top:20px">Cross-Domain Compliance Patterns</div>
+    <div class="pattern-box">
+      <h4><span class="pattern-icon">🔗</span>Pattern 1: Shared Requirements</h4>
+      <p>GDPR applies in BOTH civilian and defence contexts. Privacy requirements (R1, R3) share identical regulatory sources across domains.</p>
+    </div>
+    <div class="pattern-box">
+      <h4><span class="pattern-icon">🔀</span>Pattern 2: Divergent Frameworks</h4>
+      <p>Security requirements (R2, R4) use NIS2 for civilian deployments but NATO-specific controls (NIAP, NSP, CDP) for defence.</p>
+    </div>
+    <div class="pattern-box">
+      <h4><span class="pattern-icon">➕</span>Pattern 3: Additive Compliance</h4>
+      <p>Defence compliance is cumulative: all applicable civilian requirements PLUS NATO-specific obligations. Never substitutive.</p>
+    </div>
+  </div>
+
+  <div id="req-panel">
+    <div id="no-selection">
+      <div class="icon">←</div>
+      <p>Select a system component from the architecture diagram<br>to view its applicable regulatory requirements.</p>
+    </div>
+    <div id="req-content" style="display:none">
+      <div class="domain-tabs">
+        <div class="domain-tab active-both" id="tab-both" onclick="setDomain('both')">Both Domains</div>
+        <div class="domain-tab" id="tab-civ" onclick="setDomain('civ')">Civilian</div>
+        <div class="domain-tab" id="tab-def" onclick="setDomain('def')">Defence</div>
+      </div>
+      <div class="section-title" id="comp-title"></div>
+      <div id="req-list"></div>
+      <div id="conflict-section" style="display:none">
+        <div class="section-title" style="margin-top:20px">Dual-Use Compliance Tensions</div>
+        <div id="conflict-content"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const reqs = {
+  "CIV-R1": {id:"CIV-DESIGN-R1",name:"DPIA and Privacy by Design",domain:"civ",cat:"privacy",phase:"design",
+    source:"GDPR Article 25, Article 35",
+    basis:"DPIA required before deployment. Data minimization principles must govern image capture design: lens detection must avoid unnecessary recording. Retention periods defined during design phase. System architecture must embed privacy safeguards from inception."},
+  "CIV-R2": {id:"CIV-DESIGN-R2",name:"Security Architecture by Design",domain:"civ",cat:"security",phase:"design",
+    source:"GDPR Article 32, NIS2 Article 21",
+    basis:"Encryption architecture designed from inception. Secure communication protocols for data transmission. Hardened firmware and secure boot mechanisms. Access control frameworks architected before deployment."},
+  "CIV-R3": {id:"CIV-USAGE-R3",name:"Breach Notification and Data Subject Rights",domain:"civ",cat:"privacy",phase:"usage",
+    source:"GDPR Article 33, Article 34",
+    basis:"72-hour breach notification to supervisory authority. High-risk breaches communicated to data subjects. Data subject rights: access (Art. 15), erasure (Art. 17), restriction (Art. 18). Transparency notices in deployment locations."},
+  "CIV-R4": {id:"CIV-USAGE-R4",name:"Operational Cybersecurity Measures",domain:"civ",cat:"security",phase:"usage",
+    source:"NIS2 Article 21, GDPR Article 32",
+    basis:"Encrypted data transmission for all communications. Access controls restrict image viewing to authorised personnel. Comprehensive audit logging. Incident response documented and tested. Vulnerability management and penetration testing."},
+  "DEF-R1": {id:"DEF-DESIGN-R1",name:"DPIA and Privacy by Design",domain:"def",cat:"privacy",phase:"design",
+    source:"GDPR Article 25, Article 35",
+    basis:"Data Protection Impact Assessments identify risks, evaluate safeguards, and ensure compliance before systems go live. Embedded in privacy by design and by default principle."},
+  "DEF-R2": {id:"DEF-DESIGN-R2",name:"NATO Security Controls",domain:"def",cat:"security",phase:"design",
+    source:"NIAP, NSP",
+    basis:"NIAP: Multi-layered security controls including encryption, access controls, incident response. NSP: Access controls, physical security, personnel training for classified information."},
+  "DEF-R3": {id:"DEF-USAGE-R3",name:"Breach Notification",domain:"def",cat:"privacy",phase:"usage",
+    source:"GDPR Article 33(1)",
+    basis:"Data breaches reported to supervisory authority within 72 hours. Incident response procedures to detect, assess, and notify within the 72-hour window."},
+  "DEF-R4": {id:"DEF-USAGE-R4",name:"NATO Cyber Defence Compliance",domain:"def",cat:"security",phase:"usage",
+    source:"NATO Cyber Defence Policy",
+    basis:"Protection of digital assets from cyber threats including unauthorised data capture through non-networked means such as cameras.",
+    subs:[
+      {id:"DEF-USAGE-R4-ART3",name:"Detection Mechanisms",ref:"Article 3 ¶2",basis:"Deploy defence mechanisms including detection and reporting of unauthorised data capture."},
+      {id:"DEF-USAGE-R4-ART5",name:"Secure Incident Reporting",ref:"Article 5 ¶8",basis:"Incidents reported through secure, encrypted channels."},
+      {id:"DEF-USAGE-R4-ART7",name:"Threat Intelligence Sharing",ref:"Article 7 ¶6",basis:"Threat intelligence shared across NATO entities."}
+    ]}
+};
+
+const compMap = {
+  camera: {
+    title:"USB Camera — Captures images of room occupants",
+    civReqs:["CIV-R1"],
+    defReqs:["DEF-R1"],
+    conflicts:[{tension:"Image capture scope",civ:"Data minimisation — capture only essential",def:"Full situational awareness may be required",resolution:"Configurable capture modes per deployment context"}]
+  },
+  ai: {
+    title:"AI Detection Module — Processes visual data",
+    civReqs:["CIV-R2"],
+    defReqs:["DEF-R2"],
+    conflicts:[{tension:"Algorithm transparency",civ:"GDPR requires information about processing logic",def:"Classified architecture cannot be disclosed",resolution:"General description for civilian; detailed architecture under security clearance"}]
+  },
+  monitor: {
+    title:"Screen Interface — Displays classified content",
+    civReqs:["CIV-R2"],
+    defReqs:["DEF-R2"],
+    conflicts:[{tension:"Physical security",civ:"Standard commercial security",def:"TEMPEST certification for electromagnetic emissions",resolution:"Design to defence-grade standards; civilian deployment as subset"}]
+  },
+  transmission: {
+    title:"5G Transmission — Transmits personal data to remote server",
+    civReqs:["CIV-R4"],
+    defReqs:["DEF-R4"],
+    conflicts:[{tension:"Encryption standard",civ:"Commercial TLS/AES (GDPR Art. 32, NIS2)",def:"NATO-approved cryptographic modules",resolution:"Implement NATO-grade encryption; compliant with both"}]
+  },
+  monitoring: {
+    title:"Remote Monitoring Station — Receives alerts, stores images",
+    civReqs:["CIV-R3","CIV-R4"],
+    defReqs:["DEF-R3","DEF-R4"],
+    conflicts:[
+      {tension:"Data subject access",civ:"Right to obtain copy of personal data (Art. 15)",def:"Images may contain classified context",resolution:"Redact classified content; confirm processing without full image"},
+      {tension:"Right to erasure",civ:"Delete personal data on request (Art. 17)",def:"Security evidence may require retention",resolution:"Document legal basis for retention; define maximum period"}
+    ]
+  },
+  personnel: {
+    title:"Dedicated Security Personnel — Review and respond",
+    civReqs:["CIV-R3"],
+    defReqs:["DEF-R4"],
+    conflicts:[{tension:"Breach notification",civ:"Notify data subjects of high-risk breaches (Art. 34)",def:"Notification may compromise security operations",resolution:"Notify supervisory authority; seek guidance on subject notification"}]
+  }
+};
+
+let currentDomain = "both";
+let currentComp = null;
+
+function setDomain(d) {
+  currentDomain = d;
+  document.querySelectorAll(".domain-tab").forEach(t => t.className = "domain-tab");
+  const tab = document.getElementById("tab-"+d);
+  if(d==="both") tab.classList.add("active-both");
+  else if(d==="civ") tab.classList.add("active-civ");
+  else tab.classList.add("active-def");
+  if(currentComp) renderReqs(currentComp);
+}
+
+function renderReqs(compKey) {
+  const comp = compMap[compKey];
+  const panel = document.getElementById("req-content");
+  const noSel = document.getElementById("no-selection");
+  noSel.style.display = "none";
+  panel.style.display = "block";
+  document.getElementById("comp-title").textContent = comp.title;
+
+  let allReqs = [];
+  if(currentDomain==="both"||currentDomain==="civ") allReqs = allReqs.concat(comp.civReqs);
+  if(currentDomain==="both"||currentDomain==="def") allReqs = allReqs.concat(comp.defReqs);
+
+  const list = document.getElementById("req-list");
+  list.innerHTML = "";
+
+  allReqs.forEach(rk => {
+    const r = reqs[rk];
+    const card = document.createElement("div");
+    card.className = "req-card" + (r.domain==="def"?" highlight-def":" highlight");
+
+    let html = `<div class="req-id ${r.domain}">${r.id}</div>`;
+    html += `<div class="req-name">${r.name}</div>`;
+    html += `<div class="req-meta">`;
+    html += `<span class="req-tag ${r.cat==='privacy'?'tag-privacy':'tag-security'}">${r.cat==='privacy'?'Privacy-related':'Security-related'}</span>`;
+    html += `<span class="req-tag ${r.phase==='design'?'tag-design':'tag-usage'}">${r.phase==='design'?'Design & Development':'Usage & Maintenance'}</span>`;
+    html += `</div>`;
+    html += `<div class="req-source"><strong>Source:</strong> ${r.source}</div>`;
+    html += `<div class="req-basis">${r.basis}</div>`;
+
+    if(r.subs) {
+      html += `<div class="sub-reqs">`;
+      r.subs.forEach(s => {
+        html += `<div class="sub-req"><span class="sub-id">${s.id}</span> — ${s.name}<br><span style="color:#64748b">${s.ref}: ${s.basis}</span></div>`;
+      });
+      html += `</div>`;
+    }
+    card.innerHTML = html;
+    list.appendChild(card);
+  });
+
+  // Conflicts
+  const conflictSection = document.getElementById("conflict-section");
+  const conflictContent = document.getElementById("conflict-content");
+  if(currentDomain==="both" && comp.conflicts && comp.conflicts.length > 0) {
+    conflictSection.style.display = "block";
+    let thtml = `<table class="conflict-table"><tr><th>Tension</th><th style="color:#60a5fa">Civilian</th><th style="color:#f87171">Defence</th><th style="color:#4ade80">Resolution</th></tr>`;
+    comp.conflicts.forEach(c => {
+      thtml += `<tr><td>${c.tension}</td><td>${c.civ}</td><td>${c.def}</td><td>${c.resolution}</td></tr>`;
+    });
+    thtml += `</table>`;
+    conflictContent.innerHTML = thtml;
+  } else {
+    conflictSection.style.display = "none";
+  }
+}
+
+document.querySelectorAll(".component").forEach(el => {
+  el.addEventListener("click", () => {
+    document.querySelectorAll(".component").forEach(c => c.classList.remove("selected"));
+    el.classList.add("selected");
+    currentComp = el.dataset.comp;
+    renderReqs(currentComp);
+  });
+});
+</script>
+</body>
+</html>

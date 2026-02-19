@@ -1,0 +1,128 @@
+## ============================================================
+## FILE: query-A-all-requirements.sparql
+## Purpose: Retrieve all requirements across both domains
+## Paper reference: Section 3.1, Step 6 — Query A
+## ============================================================
+
+PREFIX rc: <http://l3ce.lt/ontology/regulatory-compliance#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?identifier ?label ?domain ?category ?article ?legalBasis
+WHERE {
+    ?req a rc:Requirement ;
+         rdfs:label ?label ;
+         rc:requirementIdentifier ?identifier ;
+         rc:hasRequirementCategory ?category ;
+         rc:appliesToDomain ?domain .
+
+    OPTIONAL { ?req rc:articleReference ?article }
+    OPTIONAL { ?req rc:legalBasis ?legalBasis }
+
+    FILTER(?domain IN (rc:CivilianDomain, rc:DefenceDomain))
+}
+ORDER BY ?domain ?identifier
+
+
+## ============================================================
+## FILE: query-B-cross-domain-pairing.sparql
+## Purpose: Side-by-side civilian <-> defence requirement pairing
+## Paper reference: Section 3.1, Step 6 — Query B
+## ============================================================
+
+PREFIX rc: <http://l3ce.lt/ontology/regulatory-compliance#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?civId ?civLabel ?civArticle ?defId ?defLabel ?defArticle
+WHERE {
+    ?civReq a rc:Requirement ;
+            rc:requirementIdentifier ?civId ;
+            rdfs:label ?civLabel ;
+            rc:appliesToDomain rc:CivilianDomain .
+    OPTIONAL { ?civReq rc:articleReference ?civArticle }
+
+    ?defReq a rc:Requirement ;
+            rc:requirementIdentifier ?defId ;
+            rdfs:label ?defLabel ;
+            rc:appliesToDomain rc:DefenceDomain .
+    OPTIONAL { ?defReq rc:articleReference ?defArticle }
+
+    FILTER(REPLACE(?civId, "CIV", "") = REPLACE(?defId, "DEF", ""))
+}
+ORDER BY ?civId
+
+
+## ============================================================
+## FILE: query-C-defence-requirements.sparql
+## Purpose: All defence domain requirements with legal basis
+## Paper reference: Section 4.2
+## ============================================================
+
+PREFIX rc: <http://l3ce.lt/ontology/regulatory-compliance#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+SELECT ?identifier ?label ?domain ?category ?article ?legalBasis
+WHERE {
+    ?req a rc:Requirement ;
+         rdfs:label ?label ;
+         rc:requirementIdentifier ?identifier ;
+         rc:hasRequirementCategory ?category ;
+         rc:appliesToDomain ?domain .
+
+    OPTIONAL { ?req rc:articleReference ?article }
+    OPTIONAL { ?req rc:legalBasis ?legalBasis }
+
+    FILTER(?domain IN (rc:CivilianDomain, rc:DefenceDomain))
+}
+ORDER BY ?domain ?identifier
+
+
+## ============================================================
+## FILE: query-D-defence-subrequirements.sparql
+## Purpose: DEF-R4 hierarchical decomposition (sub-requirements)
+## Paper reference: Section 4.2 (Table 4)
+## ============================================================
+
+PREFIX rc: <http://l3ce.lt/ontology/regulatory-compliance#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?identifier ?label ?category ?article ?legalBasis
+WHERE {
+    ?req a rc:Requirement ;
+         rdfs:label ?label ;
+         rc:requirementIdentifier ?identifier ;
+         rc:hasRequirementCategory ?category .
+
+    OPTIONAL { ?req rc:articleReference ?article }
+    OPTIONAL { ?req rc:legalBasis ?legalBasis }
+
+    FILTER(CONTAINS(?identifier, "DEF-"))
+}
+ORDER BY ?identifier
+
+
+## ============================================================
+## FILE: query-E-domain-filter.sparql
+## Purpose: Deployment-specific compliance checklist generation
+## Paper reference: Section 5.5, Implication 3
+## Usage: Change the FILTER value to rc:CivilianDomain or
+##        rc:DefenceDomain to generate domain-specific checklists
+## ============================================================
+
+PREFIX rc: <http://l3ce.lt/ontology/regulatory-compliance#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?identifier ?label ?category ?article ?legalBasis
+WHERE {
+    ?req a rc:Requirement ;
+         rdfs:label ?label ;
+         rc:requirementIdentifier ?identifier ;
+         rc:hasRequirementCategory ?category ;
+         rc:appliesToDomain ?domain .
+
+    OPTIONAL { ?req rc:articleReference ?article }
+    OPTIONAL { ?req rc:legalBasis ?legalBasis }
+
+    FILTER(?domain = rc:CivilianDomain)
+}
+ORDER BY ?identifier

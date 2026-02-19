@@ -1,0 +1,433 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rc: <http://l3ce.lt/ontology/regulatory-compliance#> .
+
+# ============================================
+# ONTOLOGY METADATA
+# ============================================
+
+<http://l3ce.lt/ontology/regulatory-compliance> a owl:Ontology ;
+    rdfs:label "EPMwDC Dual-Use Regulatory Compliance Ontology"@en ;
+    rdfs:comment "Models regulatory compliance for dual-use technologies across civilian and defence domains, with lifecycle phase decomposition and privacy/security requirement categorization"@en ;
+    owl:versionInfo "2.0" ;
+    skos:historyNote "Extended January 2026 to include lifecycle phases and concrete requirement instances"@en .
+
+# ============================================
+# OBJECT PROPERTIES
+# ============================================
+
+rc:governedBy a owl:ObjectProperty ;
+    rdfs:label "governed by"@en ;
+    rdfs:comment "Links compliance domain to governing regulations"@en ;
+    rdfs:domain rc:RegulatoryCompliance ;
+    rdfs:range rc:RegulatoryFramework .
+
+rc:hasPhase a owl:ObjectProperty ;
+    rdfs:label "has phase"@en ;
+    rdfs:comment "Links compliance domain to lifecycle phases"@en ;
+    rdfs:domain rc:RegulatoryCompliance ;
+    rdfs:range rc:LifecyclePhase .
+
+rc:hasRequirement a owl:ObjectProperty ;
+    rdfs:label "has requirement"@en ;
+    rdfs:comment "Links lifecycle phase to specific requirements"@en ;
+    rdfs:domain rc:LifecyclePhase ;
+    rdfs:range rc:Requirement .
+
+rc:hasDesignPrinciple a owl:ObjectProperty ;
+    rdfs:label "has design principle"@en ;
+    rdfs:comment "Links phase to governing design principle"@en ;
+    rdfs:domain rc:LifecyclePhase ;
+    rdfs:range rc:DesignPrinciple .
+
+rc:derivedFrom a owl:ObjectProperty ;
+    rdfs:label "derived from"@en ;
+    rdfs:comment "Links requirement to source regulation"@en ;
+    rdfs:domain rc:Requirement ;
+    rdfs:range rc:RegulatoryFramework .
+
+rc:hasDefenceEquivalent a owl:ObjectProperty ;
+    rdfs:label "has defence equivalent"@en ;
+    rdfs:comment "Maps civilian regulation to defence counterpart"@en ;
+    rdfs:domain rc:RegulatoryFramework ;
+    rdfs:range rc:RegulatoryFramework .
+
+rc:hasCivilianEquivalent a owl:ObjectProperty ;
+    rdfs:label "has civilian equivalent"@en ;
+    owl:inverseOf rc:hasDefenceEquivalent .
+
+rc:hasRequirementCategory a owl:ObjectProperty ;
+    rdfs:label "has requirement category"@en ;
+    rdfs:domain rc:Requirement ;
+    rdfs:range rc:RequirementCategory .
+
+rc:appliesToDomain a owl:ObjectProperty ;
+    rdfs:label "applies to domain"@en ;
+    rdfs:domain rc:Requirement ;
+    rdfs:range rc:ComplianceDomain .
+
+# ============================================
+# DATATYPE PROPERTIES
+# ============================================
+
+rc:requirementIdentifier a owl:DatatypeProperty ;
+    rdfs:label "requirement identifier"@en ;
+    rdfs:domain rc:Requirement ;
+    rdfs:range xsd:string .
+
+rc:legalBasis a owl:DatatypeProperty ;
+    rdfs:label "legal basis"@en ;
+    rdfs:domain rc:Requirement ;
+    rdfs:range xsd:string .
+
+rc:articleReference a owl:DatatypeProperty ;
+    rdfs:label "article reference"@en ;
+    rdfs:domain rc:Requirement ;
+    rdfs:range xsd:string .
+
+# ============================================
+# CORE CLASS HIERARCHY
+# ============================================
+
+rc:RegulatoryCompliance a owl:Class ;
+    rdfs:label "Regulatory Compliance"@en ;
+    rdfs:comment "Root class for all regulatory compliance requirements"@en .
+
+rc:ComplianceDomain a owl:Class ;
+    rdfs:label "Compliance Domain"@en .
+
+rc:CivilianDomain a owl:NamedIndividual, rc:ComplianceDomain ;
+    rdfs:label "Civilian Domain"@en .
+
+rc:DefenceDomain a owl:NamedIndividual, rc:ComplianceDomain ;
+    rdfs:label "Defence Domain"@en .
+
+# ============================================
+# DOMAIN CLASSES
+# ============================================
+
+rc:RegComplyforCivilUse a owl:Class ;
+    rdfs:subClassOf rc:RegulatoryCompliance ;
+    rdfs:label "Regulatory compliance for civilian use"@en ;
+    rc:appliesToDomain rc:CivilianDomain .
+
+rc:RegComplyforDefenceUse a owl:Class ;
+    rdfs:subClassOf rc:RegulatoryCompliance ;
+    rdfs:label "Regulatory compliance for defence use"@en ;
+    rc:appliesToDomain rc:DefenceDomain .
+
+# ============================================
+# REGULATORY FRAMEWORK CLASSES
+# ============================================
+
+rc:RegulatoryFramework a owl:Class ;
+    rdfs:label "Regulatory Framework"@en .
+
+# --- Civilian Regulatory Categories ---
+rc:InternationalRegs-Civil a owl:Class ;
+    rdfs:subClassOf rc:RegulatoryFramework ;
+    rdfs:label "International Regulations (Civilian)"@en .
+
+rc:EURegulations a owl:Class ;
+    rdfs:subClassOf rc:RegulatoryFramework ;
+    rdfs:label "EU Regulations"@en .
+
+rc:NatLawsAndRegs-Civil a owl:Class ;
+    rdfs:subClassOf rc:RegulatoryFramework ;
+    rdfs:label "National Laws and Regulations (Civilian)"@en .
+
+# --- Defence Regulatory Categories ---
+rc:NATORegulations a owl:Class ;
+    rdfs:subClassOf rc:RegulatoryFramework ;
+    rdfs:label "NATO Regulations"@en .
+
+rc:NatLawsAndRegs-Defence a owl:Class ;
+    rdfs:subClassOf rc:RegulatoryFramework ;
+    rdfs:label "National Laws and Regulations (Defence)"@en .
+
+rc:InternationalRegs-Defence a owl:Class ;
+    rdfs:subClassOf rc:RegulatoryFramework ;
+    rdfs:label "International Regulations (Defence)"@en .
+
+# ============================================
+# SPECIFIC REGULATORY FRAMEWORKS - CIVILIAN
+# ============================================
+
+rc:GDPR a owl:Class ;
+    rdfs:subClassOf rc:EURegulations ;
+    rdfs:label "GDPR"@en ;
+    skos:definition "General Data Protection Regulation (EU 2016/679)"@en .
+
+rc:EUAIAct a owl:Class ;
+    rdfs:subClassOf rc:EURegulations ;
+    rdfs:label "EU AI Act"@en ;
+    skos:definition "Regulation on Artificial Intelligence (EU 2024/1689)"@en .
+
+rc:NIS2Directive a owl:Class ;
+    rdfs:subClassOf rc:EURegulations ;
+    rdfs:label "NIS2 Directive"@en ;
+    skos:definition "Network and Information Security Directive 2 (EU 2022/2555)"@en .
+
+rc:CERDirective a owl:Class ;
+    rdfs:subClassOf rc:EURegulations ;
+    rdfs:label "CER Directive"@en ;
+    skos:definition "Critical Entities Resilience Directive (EU 2022/2557)"@en .
+
+rc:DORARegulation a owl:Class ;
+    rdfs:subClassOf rc:EURegulations ;
+    rdfs:label "DORA"@en ;
+    skos:definition "Digital Operational Resilience Act (EU 2022/2554)"@en .
+
+rc:CyberSecurityLaw-Civil a owl:Class ;
+    rdfs:subClassOf rc:NatLawsAndRegs-Civil ;
+    rdfs:label "Cyber Security Law (National)"@en .
+
+# ============================================
+# SPECIFIC REGULATORY FRAMEWORKS - DEFENCE
+# ============================================
+
+rc:NATOInformationAssurancePolicy a owl:Class ;
+    rdfs:subClassOf rc:NATORegulations ;
+    rdfs:label "NATO Information Assurance Policy (NIAP)"@en ;
+    skos:definition "Requirements for protecting NATO information systems including encryption, access controls, and incident response"@en .
+
+rc:NATOSecurityPolicy a owl:Class ;
+    rdfs:subClassOf rc:NATORegulations ;
+    rdfs:label "NATO Security Policy (NSP)"@en ;
+    skos:definition "Security measures for protecting classified information including access controls, physical security, and personnel training"@en .
+
+rc:NATOCyberDefencePolicy a owl:Class ;
+    rdfs:subClassOf rc:NATORegulations ;
+    rdfs:label "NATO Cyber Defence Policy"@en ;
+    skos:definition "Protection of digital assets from cyber threats including unauthorized data capture"@en .
+
+rc:NATOSTANAGAgreements a owl:Class ;
+    rdfs:subClassOf rc:NATORegulations ;
+    rdfs:label "NATO STANAG Agreements"@en ;
+    skos:definition "Standardization Agreements for interoperability"@en .
+
+rc:TEMPESTStandard a owl:Class ;
+    rdfs:subClassOf rc:NATORegulations ;
+    rdfs:label "TEMPEST Standard"@en ;
+    skos:definition "NATO standards for preventing electromagnetic information leakage"@en .
+
+# ============================================
+# LIFECYCLE PHASES
+# ============================================
+
+rc:LifecyclePhase a owl:Class ;
+    rdfs:label "Lifecycle Phase"@en ;
+    rdfs:comment "Phase in system development or operation lifecycle"@en .
+
+rc:DesignDevelopmentPhase a owl:Class ;
+    rdfs:subClassOf rc:LifecyclePhase ;
+    rdfs:label "Design and Development Phase"@en ;
+    rdfs:comment "Requirements applicable during system design and development"@en .
+
+rc:UsageMaintenancePhase a owl:Class ;
+    rdfs:subClassOf rc:LifecyclePhase ;
+    rdfs:label "Usage and Maintenance Phase"@en ;
+    rdfs:comment "Requirements applicable during system operation and maintenance"@en .
+
+# ============================================
+# DESIGN PRINCIPLES
+# ============================================
+
+rc:DesignPrinciple a owl:Class ;
+    rdfs:label "Design Principle"@en .
+
+rc:PrivacyByDesign a owl:NamedIndividual, rc:DesignPrinciple ;
+    rdfs:label "Privacy by Design"@en ;
+    skos:definition "GDPR Article 25 - Data protection by design and by default"@en .
+
+rc:SecurityByDesign a owl:NamedIndividual, rc:DesignPrinciple ;
+    rdfs:label "Security by Design"@en ;
+    skos:definition "GDPR Article 32 - Security of processing"@en .
+
+# ============================================
+# REQUIREMENT CATEGORIES
+# ============================================
+
+rc:RequirementCategory a owl:Class ;
+    rdfs:label "Requirement Category"@en .
+
+rc:PrivacyRelated a owl:NamedIndividual, rc:RequirementCategory ;
+    rdfs:label "Privacy-related"@en .
+
+rc:SecurityRelated a owl:NamedIndividual, rc:RequirementCategory ;
+    rdfs:label "Security-related"@en .
+
+# ============================================
+# REQUIREMENT CLASS
+# ============================================
+
+rc:Requirement a owl:Class ;
+    rdfs:label "Requirement"@en ;
+    rdfs:comment "Specific compliance requirement derived from regulations"@en .
+
+# ============================================
+# DEFENCE DOMAIN INSTANCE
+# ============================================
+
+rc:DefenceCompliance a rc:RegComplyforDefenceUse ;
+    rdfs:label "Defence Compliance Instance"@en ;
+    rc:governedBy rc:NATOInformationAssurancePolicy, rc:NATOSecurityPolicy, 
+                  rc:NATOCyberDefencePolicy, rc:TEMPESTStandard, rc:GDPR ;
+    rc:hasPhase rc:DefenceDesignPhase, rc:DefenceUsagePhase .
+
+# --- Defence Lifecycle Phase Instances ---
+rc:DefenceDesignPhase a rc:DesignDevelopmentPhase ;
+    rdfs:label "Defence Design and Development Phase"@en ;
+    rc:hasDesignPrinciple rc:PrivacyByDesign ;
+    rc:hasRequirement rc:Def-R1, rc:Def-R2 .
+
+rc:DefenceUsagePhase a rc:UsageMaintenancePhase ;
+    rdfs:label "Defence Usage and Maintenance Phase"@en ;
+    rc:hasDesignPrinciple rc:SecurityByDesign ;
+    rc:hasRequirement rc:Def-R3, rc:Def-R4 .
+
+# ============================================
+# DEFENCE REQUIREMENTS - DESIGN PHASE
+# ============================================
+
+rc:Def-R1 a rc:Requirement ;
+    rdfs:label "Def-R1: DPIA and Privacy by Design"@en ;
+    rc:requirementIdentifier "DEF-DESIGN-R1" ;
+    rc:hasRequirementCategory rc:PrivacyRelated ;
+    rc:appliesToDomain rc:DefenceDomain ;
+    rc:derivedFrom rc:GDPR ;
+    rc:articleReference "GDPR Article 25 (Data protection by design), Article 35 (DPIA)" ;
+    rc:legalBasis "Data Protection Impact Assessments identify risks, evaluate safeguards, and ensure compliance before systems go live. Embedded in privacy by design and by default principle." ;
+    skos:note "DPIAs are part of the early project lifecycle"@en .
+
+rc:Def-R2 a rc:Requirement ;
+    rdfs:label "Def-R2: NATO Security Controls"@en ;
+    rc:requirementIdentifier "DEF-DESIGN-R2" ;
+    rc:hasRequirementCategory rc:SecurityRelated ;
+    rc:appliesToDomain rc:DefenceDomain ;
+    rc:derivedFrom rc:NATOInformationAssurancePolicy, rc:NATOSecurityPolicy ;
+    rc:legalBasis "NIAP: Multi-layered security controls including encryption, access controls, incident response. NSP: Access controls, physical security, personnel training for classified information." ;
+    skos:note "Security architecture must be designed from inception"@en .
+
+# ============================================
+# DEFENCE REQUIREMENTS - USAGE/MAINTENANCE
+# ============================================
+
+rc:Def-R3 a rc:Requirement ;
+    rdfs:label "Def-R3: Breach Notification"@en ;
+    rc:requirementIdentifier "DEF-USAGE-R3" ;
+    rc:hasRequirementCategory rc:PrivacyRelated ;
+    rc:appliesToDomain rc:DefenceDomain ;
+    rc:derivedFrom rc:GDPR ;
+    rc:articleReference "GDPR Article 33(1)" ;
+    rc:legalBasis "Data breaches must be reported to supervisory authority within 72 hours. Organizations must have incident response procedures to detect, assess, and notify within the 72-hour window." ;
+    skos:note "Applies when system is deployed and actively processing personal data"@en .
+
+rc:Def-R4 a rc:Requirement ;
+    rdfs:label "Def-R4: NATO Cyber Defence Compliance"@en ;
+    rc:requirementIdentifier "DEF-USAGE-R4" ;
+    rc:hasRequirementCategory rc:SecurityRelated ;
+    rc:appliesToDomain rc:DefenceDomain ;
+    rc:derivedFrom rc:NATOCyberDefencePolicy ;
+    rc:legalBasis "Protection of digital assets from cyber threats including unauthorized data capture through non-networked means such as cameras." ;
+    skos:note "EPMwDC alignment: comprehensive detection and reporting mechanisms"@en .
+
+# --- NATO Cyber Defence Policy Article References ---
+rc:Def-R4-Art3 a rc:Requirement ;
+    rdfs:label "Def-R4a: Detection Mechanisms"@en ;
+    rc:requirementIdentifier "DEF-USAGE-R4-ART3" ;
+    rc:hasRequirementCategory rc:SecurityRelated ;
+    rc:derivedFrom rc:NATOCyberDefencePolicy ;
+    rc:articleReference "Article 3, Paragraph 2" ;
+    rc:legalBasis "Entities must deploy defence mechanisms that include detection and reporting of unauthorized data capture." .
+
+rc:Def-R4-Art5 a rc:Requirement ;
+    rdfs:label "Def-R4b: Secure Incident Reporting"@en ;
+    rc:requirementIdentifier "DEF-USAGE-R4-ART5" ;
+    rc:hasRequirementCategory rc:SecurityRelated ;
+    rc:derivedFrom rc:NATOCyberDefencePolicy ;
+    rc:articleReference "Article 5, Paragraph 8" ;
+    rc:legalBasis "Detected incidents must be reported through secure, encrypted channels." .
+
+rc:Def-R4-Art7 a rc:Requirement ;
+    rdfs:label "Def-R4c: Threat Intelligence Sharing"@en ;
+    rc:requirementIdentifier "DEF-USAGE-R4-ART7" ;
+    rc:hasRequirementCategory rc:SecurityRelated ;
+    rc:derivedFrom rc:NATOCyberDefencePolicy ;
+    rc:articleReference "Article 7, Paragraph 6" ;
+    rc:legalBasis "Threat intelligence must be shared across NATO entities." .
+
+# Link sub-requirements to parent
+rc:DefenceUsagePhase rc:hasRequirement rc:Def-R4-Art3, rc:Def-R4-Art5, rc:Def-R4-Art7 .
+
+# ============================================
+# CIVILIAN DOMAIN INSTANCE (Placeholder)
+# ============================================
+
+rc:CivilianCompliance a rc:RegComplyforCivilUse ;
+    rdfs:label "Civilian Compliance Instance"@en ;
+    rc:governedBy rc:GDPR, rc:NIS2Directive, rc:EUAIAct, rc:CERDirective ;
+    rc:hasPhase rc:CivilianDesignPhase, rc:CivilianUsagePhase .
+
+rc:CivilianDesignPhase a rc:DesignDevelopmentPhase ;
+    rdfs:label "Civilian Design and Development Phase"@en ;
+    rc:hasDesignPrinciple rc:PrivacyByDesign ;
+    rc:hasRequirement rc:Civ-R1, rc:Civ-R2 .
+
+rc:CivilianUsagePhase a rc:UsageMaintenancePhase ;
+    rdfs:label "Civilian Usage and Maintenance Phase"@en ;
+    rc:hasDesignPrinciple rc:SecurityByDesign ;
+    rc:hasRequirement rc:Civ-R3, rc:Civ-R4 .
+
+# --- Civilian Requirements (Fully Populated) ---
+rc:Civ-R1 a rc:Requirement ;
+    rdfs:label "Civ-R1: DPIA and Privacy by Design"@en ;
+    rc:requirementIdentifier "CIV-DESIGN-R1" ;
+    rc:hasRequirementCategory rc:PrivacyRelated ;
+    rc:appliesToDomain rc:CivilianDomain ;
+    rc:derivedFrom rc:GDPR ;
+    rc:articleReference "GDPR Article 25 (Data protection by design), Article 35 (DPIA)" ;
+    rc:legalBasis "Data Protection Impact Assessment required before deployment. Data minimization principles must govern image capture design: lens detection must avoid unnecessary recording, capture only what is essential for security verification. Retention periods must be defined during design phase, not post-deployment. System architecture must embed privacy safeguards from inception." ;
+    skos:note "Applies during system design to ensure privacy is built-in, not bolted-on"@en .
+
+rc:Civ-R2 a rc:Requirement ;
+    rdfs:label "Civ-R2: Security Architecture by Design"@en ;
+    rc:requirementIdentifier "CIV-DESIGN-R2" ;
+    rc:hasRequirementCategory rc:SecurityRelated ;
+    rc:appliesToDomain rc:CivilianDomain ;
+    rc:derivedFrom rc:GDPR, rc:NIS2Directive ;
+    rc:articleReference "GDPR Article 32 (Security of processing), NIS2 Article 21 (Cybersecurity risk-management measures)" ;
+    rc:legalBasis "Encryption architecture must be designed into system from inception. Secure communication protocols required for data transmission to remote monitoring station. Hardened firmware and secure boot mechanisms must be specified during development. Access control frameworks must be architected before deployment." ;
+    skos:note "Security controls must be integral to system design, not retrofitted"@en .
+
+rc:Civ-R3 a rc:Requirement ;
+    rdfs:label "Civ-R3: Breach Notification and Data Subject Rights"@en ;
+    rc:requirementIdentifier "CIV-USAGE-R3" ;
+    rc:hasRequirementCategory rc:PrivacyRelated ;
+    rc:appliesToDomain rc:CivilianDomain ;
+    rc:derivedFrom rc:GDPR ;
+    rc:articleReference "GDPR Article 33 (Notification to supervisory authority), Article 34 (Communication to data subject)" ;
+    rc:legalBasis "Personal data breaches must be reported to supervisory authority within 72 hours of becoming aware. High-risk breaches require communication to affected data subjects without undue delay. Organizations must implement data subject rights: right of access (Art. 15), right to erasure (Art. 17), right to restriction (Art. 18). Transparency notices required in deployment locations informing individuals of monitoring." ;
+    skos:note "Operational phase obligations for incident response and individual rights"@en .
+
+rc:Civ-R4 a rc:Requirement ;
+    rdfs:label "Civ-R4: Operational Cybersecurity Measures"@en ;
+    rc:requirementIdentifier "CIV-USAGE-R4" ;
+    rc:hasRequirementCategory rc:SecurityRelated ;
+    rc:appliesToDomain rc:CivilianDomain ;
+    rc:derivedFrom rc:NIS2Directive, rc:GDPR ;
+    rc:articleReference "NIS2 Article 21 (Cybersecurity risk-management measures), GDPR Article 32" ;
+    rc:legalBasis "Encrypted data transmission required for all communications to remote monitoring server. Access controls must restrict image viewing to authorized personnel only. Comprehensive audit logging of all system access and data processing activities. Incident response procedures must be documented and tested. Vulnerability management and patch deployment processes required. Regular security assessments and penetration testing." ;
+    skos:note "Ongoing operational security obligations during system deployment"@en .
+
+# ============================================
+# CROSS-DOMAIN EQUIVALENCES
+# ============================================
+
+rc:Def-R1 rc:hasCivilianEquivalent rc:Civ-R1 .
+rc:Def-R3 rc:hasCivilianEquivalent rc:Civ-R3 .
+rc:GDPR rc:hasDefenceEquivalent rc:NATOSecurityPolicy ;
+    skos:note "Partial equivalence - GDPR applies in defence context but supplemented by NATO policies"@en .

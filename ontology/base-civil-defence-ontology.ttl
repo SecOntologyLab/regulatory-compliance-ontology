@@ -1,0 +1,282 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rc: <http://l3ce.lt/ontology/regulatory-compliance#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+# ============================================
+# ONTOLOGY METADATA
+# ============================================
+
+<http://l3ce.lt/ontology/regulatory-compliance> a owl:Ontology ;
+    rdfs:label "Comprehensive Dual-Use Regulatory Compliance Framework"@en ;
+    rdfs:comment "Unified ontology for civilian and defence regulatory compliance with cross-domain mappings"@en ;
+    owl:versionInfo "2.0" ;
+    skos:note "Models both structural hierarchy and cross-domain relationships for dual-use systems"@en .
+
+# ============================================
+# ROOT CLASS
+# ============================================
+
+rc:RegulatoryCompliance a owl:Class ;
+    rdfs:label "Regulatory Compliance"@en ;
+    rdfs:comment "Root class encompassing all regulatory compliance requirements across civilian and defence domains"@en .
+
+# ============================================
+# DOMAIN CLASSES (First Level)
+# ============================================
+
+rc:RegComplyforCivilUse a owl:Class ;
+    rdfs:subClassOf rc:RegulatoryCompliance ;
+    rdfs:label "Regulatory compliance for civilian use"@en ;
+    rdfs:comment "All regulatory requirements applicable to civilian applications"@en .
+
+rc:RegComplyforDefenceUse a owl:Class ;
+    rdfs:subClassOf rc:RegulatoryCompliance ;
+    rdfs:label "Regulatory compliance for defence use"@en ;
+    rdfs:comment "All regulatory requirements applicable to defence/military applications"@en .
+
+# ============================================
+# CIVILIAN SIDE: Regulatory Categories
+# ============================================
+
+rc:InternationalRegs-Civil a owl:Class ;
+    rdfs:subClassOf rc:RegComplyforCivilUse ;
+    rdfs:label "International regulations (Civilian)"@en .
+
+rc:EUregulations a owl:Class ;
+    rdfs:subClassOf rc:RegComplyforCivilUse ;
+    rdfs:label "EU regulations"@en .
+
+rc:NatLawsAndRegs-Civil a owl:Class ;
+    rdfs:subClassOf rc:RegComplyforCivilUse ;
+    rdfs:label "National laws and regulations (Civilian)"@en .
+
+# ============================================
+# CIVILIAN SIDE: Specific Frameworks
+# ============================================
+
+# International Regulations (Civilian)
+rc:InternationalStandard-Civil-1 a owl:Class ;
+    rdfs:subClassOf rc:InternationalRegs-Civil ;
+    rdfs:label "ISO/IEC Standards"@en ;
+    skos:note "ISO 27001, ISO 27005, IEC 62443, etc."@en .
+
+# EU Regulations
+rc:GDPR a owl:Class ;
+    rdfs:subClassOf rc:EUregulations ;
+    rdfs:label "GDPR"@en ;
+    skos:definition "General Data Protection Regulation (EU 2016/679)"@en ;
+    skos:scopeNote "Data protection and privacy for EU citizens"@en .
+
+rc:EUAIAct a owl:Class ;
+    rdfs:subClassOf rc:EUregulations ;
+    rdfs:label "EU AI Act"@en ;
+    skos:definition "Regulation on Artificial Intelligence (EU 2024/1689)"@en ;
+    skos:scopeNote "Risk-based governance of AI systems"@en .
+
+rc:NIS2Directive a owl:Class ;
+    rdfs:subClassOf rc:EUregulations ;
+    rdfs:label "NIS2 Directive"@en ;
+    skos:definition "Network and Information Security Directive 2 (EU 2022/2555)"@en ;
+    skos:scopeNote "Cybersecurity measures for critical sectors"@en .
+
+rc:CERDirective a owl:Class ;
+    rdfs:subClassOf rc:EUregulations ;
+    rdfs:label "CER Directive"@en ;
+    skos:definition "Critical Entities Resilience Directive (EU 2022/2557)"@en ;
+    skos:scopeNote "Physical and cyber resilience of critical infrastructure"@en .
+
+rc:DORARegulation a owl:Class ;
+    rdfs:subClassOf rc:EUregulations ;
+    rdfs:label "DORA"@en ;
+    skos:definition "Digital Operational Resilience Act (EU 2022/2554)"@en ;
+    skos:scopeNote "ICT risk management for financial sector"@en .
+
+# National Laws and Regulations (Civilian)
+rc:CyberSecurityLaw-Civil a owl:Class ;
+    rdfs:subClassOf rc:NatLawsAndRegs-Civil ;
+    rdfs:label "Cyber Security Law (National)"@en ;
+    skos:scopeNote "National implementation of cybersecurity requirements"@en .
+
+rc:DataProtectionLaw-National a owl:Class ;
+    rdfs:subClassOf rc:NatLawsAndRegs-Civil ;
+    rdfs:label "National Data Protection Law"@en ;
+    skos:scopeNote "National GDPR implementation and extensions"@en .
+
+# ============================================
+# DEFENCE SIDE: Regulatory Categories
+# ============================================
+
+rc:NATORegulations a owl:Class ;
+    rdfs:subClassOf rc:RegComplyforDefenceUse ;
+    rdfs:label "NATO regulations"@en .
+
+rc:NatLawsAndRegs-Defence a owl:Class ;
+    rdfs:subClassOf rc:RegComplyforDefenceUse ;
+    rdfs:label "National laws and regulations (Defence)"@en .
+
+rc:InternationalRegs-Defence a owl:Class ;
+    rdfs:subClassOf rc:RegComplyforDefenceUse ;
+    rdfs:label "International regulations (Defence)"@en .
+
+# ============================================
+# DEFENCE SIDE: Specific Frameworks
+# ============================================
+
+# NATO Regulations
+rc:NATOSTANAGAgreements a owl:Class ;
+    rdfs:subClassOf rc:NATORegulations ;
+    rdfs:label "NATO STANAG Agreements"@en ;
+    skos:definition "Standardization Agreements for interoperability"@en .
+
+rc:NATOCyberDefencePolicy a owl:Class ;
+    rdfs:subClassOf rc:NATORegulations ;
+    rdfs:label "NATO Cyber Defence Policy"@en ;
+    skos:scopeNote "Alliance cyber defence strategy and requirements"@en .
+
+rc:NATOSecurityPolicy a owl:Class ;
+    rdfs:subClassOf rc:NATORegulations ;
+    rdfs:label "NATO Security Policy"@en ;
+    skos:scopeNote "Classified information handling and security clearances"@en .
+
+rc:NATOAIPrinciples a owl:Class ;
+    rdfs:subClassOf rc:NATORegulations ;
+    rdfs:label "NATO AI Principles"@en ;
+    skos:scopeNote "Responsible AI use in defence applications"@en .
+
+# National Laws and Regulations (Defence)
+rc:MilitaryDataProtectionDirective a owl:Class ;
+    rdfs:subClassOf rc:NatLawsAndRegs-Defence ;
+    rdfs:label "Military Data Protection Directive"@en ;
+    skos:scopeNote "Classified and sensitive military data handling"@en .
+
+rc:DefenceCriticalInfraProtection a owl:Class ;
+    rdfs:subClassOf rc:NatLawsAndRegs-Defence ;
+    rdfs:label "Defence Critical Infrastructure Protection"@en ;
+    skos:scopeNote "Protection of military installations and systems"@en .
+
+rc:MilitaryNetworkSecurityStandard a owl:Class ;
+    rdfs:subClassOf rc:NatLawsAndRegs-Defence ;
+    rdfs:label "Military Network Security Standard"@en ;
+    skos:scopeNote "Secure communication and network requirements"@en .
+
+# International Regulations (Defence)
+rc:GenevaConventions a owl:Class ;
+    rdfs:subClassOf rc:InternationalRegs-Defence ;
+    rdfs:label "Geneva Conventions"@en ;
+    skos:definition "International humanitarian law"@en .
+
+rc:ArmsControlTreaties a owl:Class ;
+    rdfs:subClassOf rc:InternationalRegs-Defence ;
+    rdfs:label "Arms Control Treaties"@en ;
+    skos:scopeNote "International agreements on weapons systems"@en .
+
+# ============================================
+# CROSS-DOMAIN RELATIONSHIP PROPERTIES
+# ============================================
+
+rc:hasDefenceEquivalent a owl:ObjectProperty ;
+    rdfs:label "has defence equivalent"@en ;
+    rdfs:comment "Links a civilian regulation to its functionally equivalent defence regulation"@en ;
+    rdfs:domain rc:RegComplyforCivilUse ;
+    rdfs:range rc:RegComplyforDefenceUse .
+
+rc:hasCivilianEquivalent a owl:ObjectProperty ;
+    rdfs:label "has civilian equivalent"@en ;
+    rdfs:comment "Links a defence regulation to its functionally equivalent civilian regulation"@en ;
+    rdfs:domain rc:RegComplyforDefenceUse ;
+    rdfs:range rc:RegComplyforCivilUse ;
+    owl:inverseOf rc:hasDefenceEquivalent .
+
+rc:hasStricterDefenceVersion a owl:ObjectProperty ;
+    rdfs:label "has stricter defence version"@en ;
+    rdfs:comment "Indicates defence regulation is stricter/more restrictive than civilian equivalent"@en ;
+    rdfs:subPropertyOf rc:hasDefenceEquivalent ;
+    rdfs:domain rc:RegComplyforCivilUse ;
+    rdfs:range rc:RegComplyforDefenceUse .
+
+rc:hasRelatedRequirement a owl:ObjectProperty, owl:SymmetricProperty ;
+    rdfs:label "has related requirement"@en ;
+    rdfs:comment "Links related but not equivalent regulations across domains"@en .
+
+rc:conflictsWith a owl:ObjectProperty, owl:SymmetricProperty ;
+    rdfs:label "conflicts with"@en ;
+    rdfs:comment "Indicates regulatory requirements that are incompatible or contradictory"@en .
+
+rc:complementsRequirement a owl:ObjectProperty, owl:SymmetricProperty ;
+    rdfs:label "complements requirement"@en ;
+    rdfs:comment "Indicates regulations that work together to address the same risk"@en .
+
+# ============================================
+# DOMAIN MARKER PROPERTIES
+# ============================================
+
+rc:applicableToDomain a owl:ObjectProperty ;
+    rdfs:label "applicable to domain"@en ;
+    rdfs:comment "Indicates which operational domain(s) a regulation applies to"@en .
+
+rc:CivilianDomain a owl:NamedIndividual ;
+    rdfs:label "Civilian Domain"@en .
+
+rc:DefenceDomain a owl:NamedIndividual ;
+    rdfs:label "Defence Domain"@en .
+
+rc:DualUseDomain a owl:NamedIndividual ;
+    rdfs:label "Dual-Use Domain"@en ;
+    rdfs:comment "Systems/technologies that span both civilian and defence applications"@en .
+
+# ============================================
+# COMPREHENSIVE CROSS-DOMAIN MAPPINGS
+# ============================================
+
+## Data Protection Mappings
+rc:GDPR rc:hasDefenceEquivalent rc:MilitaryDataProtectionDirective ;
+        rc:hasStricterDefenceVersion rc:NATOSecurityPolicy ;
+        rc:hasRelatedRequirement rc:GenevaConventions .
+
+rc:DataProtectionLaw-National rc:hasDefenceEquivalent rc:MilitaryDataProtectionDirective .
+
+## AI Governance Mappings
+rc:EUAIAct rc:hasDefenceEquivalent rc:NATOAIPrinciples ;
+           rc:hasRelatedRequirement rc:ArmsControlTreaties ;
+           rc:complementsRequirement rc:GenevaConventions .
+
+## Cybersecurity Mappings
+rc:NIS2Directive rc:hasDefenceEquivalent rc:NATOCyberDefencePolicy ;
+                 rc:hasStricterDefenceVersion rc:MilitaryNetworkSecurityStandard ;
+                 rc:complementsRequirement rc:CyberSecurityLaw-Civil .
+
+rc:CyberSecurityLaw-Civil rc:hasDefenceEquivalent rc:MilitaryNetworkSecurityStandard .
+
+## Critical Infrastructure Mappings
+rc:CERDirective rc:hasDefenceEquivalent rc:DefenceCriticalInfraProtection ;
+                rc:hasStricterDefenceVersion rc:NATOSTANAGAgreements ;
+                rc:complementsRequirement rc:NIS2Directive .
+
+## Financial/Operational Resilience Mappings
+rc:DORARegulation rc:hasRelatedRequirement rc:NATOCyberDefencePolicy ;
+                  rc:complementsRequirement rc:NIS2Directive .
+
+## International Standards Mappings
+rc:InternationalStandard-Civil-1 rc:hasDefenceEquivalent rc:NATOSTANAGAgreements ;
+                                 rc:complementsRequirement rc:MilitaryNetworkSecurityStandard .
+
+# ============================================
+# DOMAIN APPLICABILITY ASSERTIONS
+# ============================================
+
+rc:RegComplyforCivilUse rc:applicableToDomain rc:CivilianDomain .
+rc:RegComplyforDefenceUse rc:applicableToDomain rc:DefenceDomain .
+
+# Dual-use examples (systems that must satisfy both)
+rc:MedicalAISystem a owl:NamedIndividual ;
+    rdfs:label "Medical AI System (Dual-Use)"@en ;
+    rc:applicableToDomain rc:CivilianDomain, rc:DefenceDomain ;
+    skos:example "AI diagnostic system used in both civilian and military hospitals"@en .
+
+rc:TelecomInfrastructure a owl:NamedIndividual ;
+    rdfs:label "Telecommunications Infrastructure (Dual-Use)"@en ;
+    rc:applicableToDomain rc:DualUseDomain ;
+    skos:example "5G networks serving both civilian and defence communications"@en .

@@ -1,0 +1,57 @@
+@prefix rc:   <http://l3ce.lt/ontology/regulatory-compliance#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+########################
+# Reuse same classes & properties
+########################
+
+# We reuse rc:RequirementGroup, rc:Requirement, rc:PrivacyRequirement,
+# rc:SecurityRequirement, rc:DesignPrinciple, rc:LifecyclePhase,
+# rc:hasRequirementGroup, rc:hasRequirement, rc:appliesToPhase,
+# rc:guidedByPrinciple — already declared in ontology + civil module.
+
+########################
+# Individual: defence compliance PROFILE for this use case
+########################
+
+rc:Baseline_DefenceCompliance a rc:RegComplyforDefenceUse ;
+    rdfs:label "Baseline defence regulatory compliance profile" ;
+    rc:hasRequirementGroup rc:Baseline_Def_DesignAndDevelopmentRequirements ,
+                           rc:Baseline_Def_UsageAndMaintenanceRequirements .
+
+########################
+# Individuals: defence requirement groups
+########################
+
+rc:Baseline_Def_DesignAndDevelopmentRequirements a rc:RequirementGroup ;
+    rdfs:label "Baseline requirements for design and development phases (defence domain)" ;
+    rc:appliesToPhase rc:DesignAndDevelopmentPhase ;
+    rc:hasRequirement rc:Baseline_Def_R1 , rc:Baseline_Def_R2 .
+
+rc:Baseline_Def_UsageAndMaintenanceRequirements a rc:RequirementGroup ;
+    rdfs:label "Baseline requirements for usage and maintenance phases (defence domain)" ;
+    rc:appliesToPhase rc:UsageAndMaintenancePhase ;
+    rc:hasRequirement rc:Baseline_Def_R3 , rc:Baseline_Def_R4 .
+
+########################
+# Individuals: example defence requirements
+########################
+
+rc:Baseline_Def_R1 a rc:PrivacyRequirement ;
+    rdfs:label "Def-R1 – example privacy requirement in design & development (defence)" ;
+    rc:guidedByPrinciple rc:SecurityByDesign .
+
+rc:Baseline_Def_R2 a rc:SecurityRequirement ;
+    rdfs:label "Def-R2 – example security requirement in design & development (defence)" ;
+    rc:guidedByPrinciple rc:SecurityByDesign .
+
+rc:Baseline_Def_R3 a rc:PrivacyRequirement ;
+    rdfs:label "Def-R3 – example operational data-protection requirement" ;
+    rc:guidedByPrinciple rc:PrivacyByDesign .
+
+rc:Baseline_Def_R4 a rc:SecurityRequirement ;
+    rdfs:label "Def-R4 – example operational incident-detection/reporting requirement" ;
+    rc:guidedByPrinciple rc:SecurityByDesign .

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EPMwDC Dual-Use Regulatory Compliance Ontology — Knowledge Graph</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0a0e17; color: #c8d0de; overflow: hidden; }
+#header { position: fixed; top: 0; left: 0; right: 0; z-index: 10; background: rgba(10,14,23,0.92); backdrop-filter: blur(8px); border-bottom: 1px solid #1e2a3a; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; }
+#header h1 { font-size: 16px; font-weight: 600; color: #e2e8f0; }
+#header span { font-size: 12px; color: #64748b; }
+#legend { position: fixed; top: 60px; left: 16px; z-index: 10; background: rgba(15,20,32,0.92); backdrop-filter: blur(8px); border: 1px solid #1e2a3a; border-radius: 8px; padding: 14px 16px; font-size: 12px; max-width: 220px; }
+#legend h3 { font-size: 13px; color: #94a3b8; margin-bottom: 10px; font-weight: 600; }
+.leg-item { display: flex; align-items: center; margin-bottom: 6px; }
+.leg-dot { width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; flex-shrink: 0; }
+#info { position: fixed; bottom: 16px; right: 16px; z-index: 10; background: rgba(15,20,32,0.95); backdrop-filter: blur(8px); border: 1px solid #1e2a3a; border-radius: 8px; padding: 16px 20px; font-size: 12px; max-width: 380px; max-height: 50vh; overflow-y: auto; display: none; }
+#info h3 { font-size: 14px; color: #e2e8f0; margin-bottom: 8px; }
+#info .field { margin-bottom: 6px; }
+#info .field-label { color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+#info .field-value { color: #c8d0de; margin-top: 2px; }
+#controls { position: fixed; bottom: 16px; left: 16px; z-index: 10; display: flex; gap: 8px; }
+#controls button { background: rgba(15,20,32,0.92); border: 1px solid #1e2a3a; border-radius: 6px; color: #94a3b8; padding: 8px 14px; font-size: 12px; cursor: pointer; }
+#controls button:hover { background: #1e2a3a; color: #e2e8f0; }
+svg { width: 100vw; height: 100vh; }
+.link { stroke-opacity: 0.4; }
+.link-label { font-size: 9px; fill: #475569; pointer-events: none; }
+.node-label { font-size: 11px; pointer-events: none; font-weight: 500; }
+.node-label.dim { opacity: 0.3; }
+.node.dim circle { opacity: 0.15; }
+.link.dim { stroke-opacity: 0.05; }
+</style>
+</head>
+<body>
+<div id="header">
+  <h1>EPMwDC Dual-Use Regulatory Compliance Ontology</h1>
+  <span>Interactive Knowledge Graph · Click nodes for details · Drag to reposition</span>
+</div>
+<div id="legend">
+  <h3>Node Types</h3>
+  <div class="leg-item"><div class="leg-dot" style="background:#6366f1"></div> Root / Structural</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#3b82f6"></div> Civilian Domain</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#ef4444"></div> Defence Domain</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#22c55e"></div> EU Regulation</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#f59e0b"></div> NATO Framework</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#8b5cf6"></div> Lifecycle Phase</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#ec4899"></div> Design Principle</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#06b6d4"></div> Requirement (Civ)</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#f97316"></div> Requirement (Def)</div>
+  <h3 style="margin-top:12px">Edge Types</h3>
+  <div class="leg-item"><div style="width:24px;height:2px;background:#475569;margin-right:8px"></div> subClassOf</div>
+  <div class="leg-item"><div style="width:24px;height:2px;background:#22c55e;margin-right:8px"></div> governedBy</div>
+  <div class="leg-item"><div style="width:24px;height:2px;background:#8b5cf6;margin-right:8px"></div> hasPhase</div>
+  <div class="leg-item"><div style="width:24px;height:2px;background:#06b6d4;margin-right:8px"></div> hasRequirement</div>
+  <div class="leg-item"><div style="width:24px;height:2px;background:#ec4899;margin-right:8px"></div> derivedFrom</div>
+</div>
+<div id="info"></div>
+<div id="controls">
+  <button onclick="resetView()">Reset View</button>
+  <button onclick="toggleLabels()">Toggle Labels</button>
+</div>
+<svg></svg>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script>
+const nodes = [
+  // Root
+  {id:"RegulatoryCompliance", label:"Regulatory\nCompliance", group:"root", r:20, info:{type:"Root Class", desc:"Root class for all regulatory compliance requirements"}},
+  // Domains
+  {id:"RegComplyforCivilUse", label:"Civilian\nCompliance", group:"civ-domain", r:16, info:{type:"Domain Class", desc:"Regulatory compliance for civilian use"}},
+  {id:"RegComplyforDefenceUse", label:"Defence\nCompliance", group:"def-domain", r:16, info:{type:"Domain Class", desc:"Regulatory compliance for defence use"}},
+  // Regulatory framework categories
+  {id:"EURegulations", label:"EU Regulations", group:"eu-reg", r:14, info:{type:"Framework Category"}},
+  {id:"NATORegulations", label:"NATO Regulations", group:"nato", r:14, info:{type:"Framework Category"}},
+  {id:"NatLawsCivil", label:"National Laws\n(Civilian)", group:"root", r:10, info:{type:"Framework Category"}},
+  {id:"NatLawsDefence", label:"National Laws\n(Defence)", group:"root", r:10, info:{type:"Framework Category"}},
+  // EU Regulations
+  {id:"GDPR", label:"GDPR", group:"eu-reg", r:13, info:{type:"EU Regulation", desc:"General Data Protection Regulation (EU 2016/679)", note:"Applies in BOTH civilian and defence contexts"}},
+  {id:"NIS2", label:"NIS2 Directive", group:"eu-reg", r:11, info:{type:"EU Regulation", desc:"Network and Information Security Directive 2 (EU 2022/2555)"}},
+  {id:"EUAIAct", label:"EU AI Act", group:"eu-reg", r:11, info:{type:"EU Regulation", desc:"Regulation on Artificial Intelligence (EU 2024/1689)"}},
+  {id:"CER", label:"CER Directive", group:"eu-reg", r:9, info:{type:"EU Regulation", desc:"Critical Entities Resilience Directive (EU 2022/2557)"}},
+  {id:"DORA", label:"DORA", group:"eu-reg", r:9, info:{type:"EU Regulation", desc:"Digital Operational Resilience Act (EU 2022/2554)"}},
+  // NATO Frameworks
+  {id:"NIAP", label:"NIAP", group:"nato", r:11, info:{type:"NATO Framework", desc:"NATO Information Assurance Policy — encryption, access controls, incident response"}},
+  {id:"NSP", label:"NSP", group:"nato", r:11, info:{type:"NATO Framework", desc:"NATO Security Policy — access controls, physical security, personnel training"}},
+  {id:"NATOCyberDef", label:"NATO Cyber\nDefence Policy", group:"nato", r:11, info:{type:"NATO Framework", desc:"Protection of digital assets from cyber threats"}},
+  {id:"TEMPEST", label:"TEMPEST", group:"nato", r:9, info:{type:"NATO Framework", desc:"Standards for preventing electromagnetic information leakage"}},
+  {id:"STANAG", label:"STANAG", group:"nato", r:9, info:{type:"NATO Framework", desc:"Standardization Agreements for interoperability"}},
+  // Compliance instances
+  {id:"CivCompliance", label:"Civilian\nCompliance\nInstance", group:"civ-domain", r:14, info:{type:"Instance", desc:"Governed by GDPR, NIS2, EU AI Act, CER Directive"}},
+  {id:"DefCompliance", label:"Defence\nCompliance\nInstance", group:"def-domain", r:14, info:{type:"Instance", desc:"Governed by NIAP, NSP, NATO CDP, TEMPEST, GDPR"}},
+  // Lifecycle phases
+  {id:"CivDesign", label:"Civilian\nDesign Phase", group:"phase", r:12, info:{type:"Lifecycle Phase", desc:"Design & Development (pre-deployment)", principle:"Privacy by Design (GDPR Art. 25)"}},
+  {id:"CivUsage", label:"Civilian\nUsage Phase", group:"phase", r:12, info:{type:"Lifecycle Phase", desc:"Usage & Maintenance (post-deployment)", principle:"Security by Design (GDPR Art. 32)"}},
+  {id:"DefDesign", label:"Defence\nDesign Phase", group:"phase", r:12, info:{type:"Lifecycle Phase", desc:"Design & Development (pre-deployment)", principle:"Privacy by Design (GDPR Art. 25)"}},
+  {id:"DefUsage", label:"Defence\nUsage Phase", group:"phase", r:12, info:{type:"Lifecycle Phase", desc:"Usage & Maintenance (post-deployment)", principle:"Security by Design (GDPR Art. 32)"}},
+  // Design principles
+  {id:"PbD", label:"Privacy\nby Design", group:"principle", r:10, info:{type:"Design Principle", desc:"GDPR Article 25 — Data protection by design and by default"}},
+  {id:"SbD", label:"Security\nby Design", group:"principle", r:10, info:{type:"Design Principle", desc:"GDPR Article 32 — Security of processing"}},
+  // Civilian requirements
+  {id:"CivR1", label:"CIV-R1\nDPIA & Privacy", group:"civ-req", r:10, info:{type:"Requirement", id:"CIV-DESIGN-R1", cat:"Privacy-related", source:"GDPR Art. 25, 35", basis:"DPIA required before deployment. Data minimization principles. Retention periods defined during design."}},
+  {id:"CivR2", label:"CIV-R2\nSecurity Arch.", group:"civ-req", r:10, info:{type:"Requirement", id:"CIV-DESIGN-R2", cat:"Security-related", source:"GDPR Art. 32, NIS2 Art. 21", basis:"Encryption architecture from inception. Secure comms. Hardened firmware. Access control frameworks."}},
+  {id:"CivR3", label:"CIV-R3\nBreach Notif.", group:"civ-req", r:10, info:{type:"Requirement", id:"CIV-USAGE-R3", cat:"Privacy-related", source:"GDPR Art. 33, 34", basis:"72-hour breach notification. Data subject rights: access, erasure, restriction. Transparency notices."}},
+  {id:"CivR4", label:"CIV-R4\nOps CyberSec", group:"civ-req", r:10, info:{type:"Requirement", id:"CIV-USAGE-R4", cat:"Security-related", source:"NIS2 Art. 21, GDPR Art. 32", basis:"Encrypted transmission. Access controls. Audit logging. Incident response. Vulnerability management."}},
+  // Defence requirements
+  {id:"DefR1", label:"DEF-R1\nDPIA & Privacy", group:"def-req", r:10, info:{type:"Requirement", id:"DEF-DESIGN-R1", cat:"Privacy-related", source:"GDPR Art. 25, 35", basis:"DPIAs identify risks, evaluate safeguards, ensure compliance before go-live."}},
+  {id:"DefR2", label:"DEF-R2\nNATO Security", group:"def-req", r:10, info:{type:"Requirement", id:"DEF-DESIGN-R2", cat:"Security-related", source:"NIAP, NSP", basis:"Multi-layered security: encryption, access controls, physical security, personnel training."}},
+  {id:"DefR3", label:"DEF-R3\nBreach Notif.", group:"def-req", r:10, info:{type:"Requirement", id:"DEF-USAGE-R3", cat:"Privacy-related", source:"GDPR Art. 33(1)", basis:"72-hour breach reporting. Incident response procedures."}},
+  {id:"DefR4", label:"DEF-R4\nNATO Cyber Def.", group:"def-req", r:10, info:{type:"Requirement", id:"DEF-USAGE-R4", cat:"Security-related", source:"NATO Cyber Defence Policy", basis:"Protection from cyber threats incl. unauthorised data capture via cameras."}},
+  // Sub-requirements
+  {id:"DefR4A3", label:"DEF-R4-ART3\nDetection", group:"def-req", r:7, info:{type:"Sub-requirement", id:"DEF-USAGE-R4-ART3", source:"Art. 3 ¶2", basis:"Detection and reporting of unauthorised data capture."}},
+  {id:"DefR4A5", label:"DEF-R4-ART5\nIncident Rpt.", group:"def-req", r:7, info:{type:"Sub-requirement", id:"DEF-USAGE-R4-ART5", source:"Art. 5 ¶8", basis:"Incidents reported through secure encrypted channels."}},
+  {id:"DefR4A7", label:"DEF-R4-ART7\nThreat Intel", group:"def-req", r:7, info:{type:"Sub-requirement", id:"DEF-USAGE-R4-ART7", source:"Art. 7 ¶6", basis:"Threat intelligence shared across NATO entities."}},
+];
+
+const links = [
+  // Subclass hierarchy
+  {source:"RegComplyforCivilUse", target:"RegulatoryCompliance", type:"subClassOf"},
+  {source:"RegComplyforDefenceUse", target:"RegulatoryCompliance", type:"subClassOf"},
+  {source:"EURegulations", target:"RegulatoryCompliance", type:"subClassOf"},
+  {source:"NATORegulations", target:"RegulatoryCompliance", type:"subClassOf"},
+  {source:"NatLawsCivil", target:"RegulatoryCompliance", type:"subClassOf"},
+  {source:"NatLawsDefence", target:"RegulatoryCompliance", type:"subClassOf"},
+  // EU reg hierarchy
+  {source:"GDPR", target:"EURegulations", type:"subClassOf"},
+  {source:"NIS2", target:"EURegulations", type:"subClassOf"},
+  {source:"EUAIAct", target:"EURegulations", type:"subClassOf"},
+  {source:"CER", target:"EURegulations", type:"subClassOf"},
+  {source:"DORA", target:"EURegulations", type:"subClassOf"},
+  // NATO hierarchy
+  {source:"NIAP", target:"NATORegulations", type:"subClassOf"},
+  {source:"NSP", target:"NATORegulations", type:"subClassOf"},
+  {source:"NATOCyberDef", target:"NATORegulations", type:"subClassOf"},
+  {source:"TEMPEST", target:"NATORegulations", type:"subClassOf"},
+  {source:"STANAG", target:"NATORegulations", type:"subClassOf"},
+  // Instance types
+  {source:"CivCompliance", target:"RegComplyforCivilUse", type:"instanceOf"},
+  {source:"DefCompliance", target:"RegComplyforDefenceUse", type:"instanceOf"},
+  // governedBy
+  {source:"CivCompliance", target:"GDPR", type:"governedBy"},
+  {source:"CivCompliance", target:"NIS2", type:"governedBy"},
+  {source:"CivCompliance", target:"EUAIAct", type:"governedBy"},
+  {source:"CivCompliance", target:"CER", type:"governedBy"},
+  {source:"DefCompliance", target:"GDPR", type:"governedBy"},
+  {source:"DefCompliance", target:"NIAP", type:"governedBy"},
+  {source:"DefCompliance", target:"NSP", type:"governedBy"},
+  {source:"DefCompliance", target:"NATOCyberDef", type:"governedBy"},
+  {source:"DefCompliance", target:"TEMPEST", type:"governedBy"},
+  // hasPhase
+  {source:"CivCompliance", target:"CivDesign", type:"hasPhase"},
+  {source:"CivCompliance", target:"CivUsage", type:"hasPhase"},
+  {source:"DefCompliance", target:"DefDesign", type:"hasPhase"},
+  {source:"DefCompliance", target:"DefUsage", type:"hasPhase"},
+  // Design principles
+  {source:"CivDesign", target:"PbD", type:"hasDesignPrinciple"},
+  {source:"CivUsage", target:"SbD", type:"hasDesignPrinciple"},
+  {source:"DefDesign", target:"PbD", type:"hasDesignPrinciple"},
+  {source:"DefUsage", target:"SbD", type:"hasDesignPrinciple"},
+  // hasRequirement - civilian
+  {source:"CivDesign", target:"CivR1", type:"hasRequirement"},
+  {source:"CivDesign", target:"CivR2", type:"hasRequirement"},
+  {source:"CivUsage", target:"CivR3", type:"hasRequirement"},
+  {source:"CivUsage", target:"CivR4", type:"hasRequirement"},
+  // hasRequirement - defence
+  {source:"DefDesign", target:"DefR1", type:"hasRequirement"},
+  {source:"DefDesign", target:"DefR2", type:"hasRequirement"},
+  {source:"DefUsage", target:"DefR3", type:"hasRequirement"},
+  {source:"DefUsage", target:"DefR4", type:"hasRequirement"},
+  {source:"DefUsage", target:"DefR4A3", type:"hasRequirement"},
+  {source:"DefUsage", target:"DefR4A5", type:"hasRequirement"},
+  {source:"DefUsage", target:"DefR4A7", type:"hasRequirement"},
+  // derivedFrom - civilian
+  {source:"CivR1", target:"GDPR", type:"derivedFrom"},
+  {source:"CivR2", target:"GDPR", type:"derivedFrom"},
+  {source:"CivR2", target:"NIS2", type:"derivedFrom"},
+  {source:"CivR3", target:"GDPR", type:"derivedFrom"},
+  {source:"CivR4", target:"NIS2", type:"derivedFrom"},
+  {source:"CivR4", target:"GDPR", type:"derivedFrom"},
+  // derivedFrom - defence
+  {source:"DefR1", target:"GDPR", type:"derivedFrom"},
+  {source:"DefR2", target:"NIAP", type:"derivedFrom"},
+  {source:"DefR2", target:"NSP", type:"derivedFrom"},
+  {source:"DefR3", target:"GDPR", type:"derivedFrom"},
+  {source:"DefR4", target:"NATOCyberDef", type:"derivedFrom"},
+  {source:"DefR4A3", target:"NATOCyberDef", type:"derivedFrom"},
+  {source:"DefR4A5", target:"NATOCyberDef", type:"derivedFrom"},
+  {source:"DefR4A7", target:"NATOCyberDef", type:"derivedFrom"},
+  // Cross-domain equivalences
+  {source:"DefR1", target:"CivR1", type:"hasCivilianEquivalent"},
+  {source:"DefR3", target:"CivR3", type:"hasCivilianEquivalent"},
+];
+
+const colorMap = {
+  "root":"#6366f1","civ-domain":"#3b82f6","def-domain":"#ef4444",
+  "eu-reg":"#22c55e","nato":"#f59e0b","phase":"#8b5cf6",
+  "principle":"#ec4899","civ-req":"#06b6d4","def-req":"#f97316"
+};
+const edgeColor = {
+  "subClassOf":"#475569","instanceOf":"#475569","governedBy":"#22c55e",
+  "hasPhase":"#8b5cf6","hasDesignPrinciple":"#ec4899",
+  "hasRequirement":"#06b6d4","derivedFrom":"#ec4899",
+  "hasCivilianEquivalent":"#fbbf24"
+};
+
+const W = window.innerWidth, H = window.innerHeight;
+const svg = d3.select("svg").attr("viewBox",[0,0,W,H]);
+const g = svg.append("g");
+const zoom = d3.zoom().scaleExtent([0.2,4]).on("zoom", e => g.attr("transform",e.transform));
+svg.call(zoom);
+
+const sim = d3.forceSimulation(nodes)
+  .force("link", d3.forceLink(links).id(d=>d.id).distance(d=>{
+    if(d.type==="subClassOf"||d.type==="instanceOf") return 80;
+    if(d.type==="hasRequirement") return 60;
+    return 100;
+  }))
+  .force("charge", d3.forceManyBody().strength(-300))
+  .force("center", d3.forceCenter(W/2, H/2))
+  .force("collision", d3.forceCollide().radius(d=>d.r+20));
+
+const link = g.append("g").selectAll("line").data(links).join("line")
+  .attr("class","link").attr("stroke",d=>edgeColor[d.type]||"#334155").attr("stroke-width",1.5)
+  .attr("stroke-dasharray",d=>d.type==="hasCivilianEquivalent"?"4,3":null);
+
+const linkLabel = g.append("g").selectAll("text").data(links.filter(d=>["governedBy","hasPhase","hasRequirement","derivedFrom","hasCivilianEquivalent"].includes(d.type)))
+  .join("text").attr("class","link-label").text(d=>d.type);
+
+const node = g.append("g").selectAll("g").data(nodes).join("g").attr("class","node")
+  .call(d3.drag().on("start",(e,d)=>{if(!e.active)sim.alphaTarget(0.3).restart();d.fx=d.x;d.fy=d.y})
+  .on("drag",(e,d)=>{d.fx=e.x;d.fy=e.y}).on("end",(e,d)=>{if(!e.active)sim.alphaTarget(0);d.fx=null;d.fy=null}));
+
+node.append("circle").attr("r",d=>d.r).attr("fill",d=>colorMap[d.group])
+  .attr("stroke",d=>d3.color(colorMap[d.group]).brighter(0.8)).attr("stroke-width",1.5).attr("opacity",0.9);
+
+let labelsVisible = true;
+const label = node.append("text").attr("class","node-label").attr("dy",d=>d.r+14)
+  .attr("text-anchor","middle").attr("fill",d=>d3.color(colorMap[d.group]).brighter(1.2))
+  .each(function(d){
+    const lines = d.label.split("\n");
+    const el = d3.select(this);
+    el.text(null);
+    lines.forEach((ln,i) => el.append("tspan").attr("x",0).attr("dy", i===0?"0":"1.15em").text(ln));
+  });
+
+node.on("click",(e,d)=>{
+  e.stopPropagation();
+  const info = d.info;
+  const panel = document.getElementById("info");
+  let html = `<h3>${d.label.replace(/\n/g," ")}</h3>`;
+  if(info.type) html += `<div class="field"><div class="field-label">Type</div><div class="field-value">${info.type}</div></div>`;
+  if(info.id) html += `<div class="field"><div class="field-label">Identifier</div><div class="field-value">${info.id}</div></div>`;
+  if(info.cat) html += `<div class="field"><div class="field-label">Category</div><div class="field-value">${info.cat}</div></div>`;
+  if(info.desc) html += `<div class="field"><div class="field-label">Description</div><div class="field-value">${info.desc}</div></div>`;
+  if(info.source) html += `<div class="field"><div class="field-label">Regulatory Source</div><div class="field-value">${info.source}</div></div>`;
+  if(info.basis) html += `<div class="field"><div class="field-label">Legal Basis</div><div class="field-value">${info.basis}</div></div>`;
+  if(info.principle) html += `<div class="field"><div class="field-label">Design Principle</div><div class="field-value">${info.principle}</div></div>`;
+  if(info.note) html += `<div class="field"><div class="field-label">Note</div><div class="field-value">${info.note}</div></div>`;
+  panel.innerHTML = html;
+  panel.style.display = "block";
+  // Highlight connected
+  const connected = new Set([d.id]);
+  links.forEach(l => { if(l.source.id===d.id) connected.add(l.target.id); if(l.target.id===d.id) connected.add(l.source.id); });
+  node.classed("dim", n => !connected.has(n.id));
+  link.classed("dim", l => l.source.id!==d.id && l.target.id!==d.id);
+  label.classed("dim", n => !connected.has(n.id));
+});
+
+svg.on("click", () => {
+  document.getElementById("info").style.display = "none";
+  node.classed("dim",false); link.classed("dim",false); label.classed("dim",false);
+});
+
+sim.on("tick",()=>{
+  link.attr("x1",d=>d.source.x).attr("y1",d=>d.source.y).attr("x2",d=>d.target.x).attr("y2",d=>d.target.y);
+  linkLabel.attr("x",d=>(d.source.x+d.target.x)/2).attr("y",d=>(d.source.y+d.target.y)/2);
+  node.attr("transform",d=>`translate(${d.x},${d.y})`);
+});
+
+function resetView(){ svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity); }
+function toggleLabels(){ labelsVisible=!labelsVisible; label.style("display",labelsVisible?"block":"none"); }
+</script>
+</body>
+</html>

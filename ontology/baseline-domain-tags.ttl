@@ -1,0 +1,10 @@
+@prefix rc:   <http://l3ce.lt/ontology/regulatory-compliance#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# Explicitly mark which side each profile belongs to
+
+rc:Baseline_CivilCompliance
+    rc:applicableToDomain rc:CivilianDomain .
+
+rc:Baseline_DefenceCompliance
+    rc:applicableToDomain rc:DefenceDomain .

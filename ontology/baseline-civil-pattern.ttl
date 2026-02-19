@@ -1,0 +1,116 @@
+@prefix rc:   <http://l3ce.lt/ontology/regulatory-compliance#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+########################
+# Classes (data-side; same IRIs as we used before)
+########################
+
+rc:RequirementGroup a owl:Class ;
+    rdfs:label "Requirement group" .
+
+rc:Requirement a owl:Class ;
+    rdfs:label "Requirement" .
+
+rc:PrivacyRequirement a owl:Class ;
+    rdfs:subClassOf rc:Requirement ;
+    rdfs:label "Privacy-related requirement" .
+
+rc:SecurityRequirement a owl:Class ;
+    rdfs:subClassOf rc:Requirement ;
+    rdfs:label "Security-related requirement" .
+
+rc:DesignPrinciple a owl:Class ;
+    rdfs:label "Design principle" .
+
+rc:LifecyclePhase a owl:Class ;
+    rdfs:label "Lifecycle phase" .
+
+########################
+# Object properties
+########################
+
+rc:hasRequirementGroup a owl:ObjectProperty ;
+    rdfs:domain rc:RegComplyforCivilUse ;
+    rdfs:range  rc:RequirementGroup ;
+    rdfs:label "has requirement group" .
+
+rc:hasRequirement a owl:ObjectProperty ;
+    rdfs:domain rc:RequirementGroup ;
+    rdfs:range  rc:Requirement ;
+    rdfs:label "has requirement" .
+
+rc:appliesToPhase a owl:ObjectProperty ;
+    rdfs:domain rc:RequirementGroup ;
+    rdfs:range  rc:LifecyclePhase ;
+    rdfs:label "applies to lifecycle phase" .
+
+rc:guidedByPrinciple a owl:ObjectProperty ;
+    rdfs:domain rc:Requirement ;
+    rdfs:range  rc:DesignPrinciple ;
+    rdfs:label "guided by design principle" .
+
+########################
+# Individuals: phases
+########################
+
+rc:DesignAndDevelopmentPhase a rc:LifecyclePhase ;
+    rdfs:label "Design and development phase" .
+
+rc:UsageAndMaintenancePhase a rc:LifecyclePhase ;
+    rdfs:label "Usage and maintenance phase" .
+
+########################
+# Individuals: principles
+########################
+
+rc:PrivacyByDesign a rc:DesignPrinciple ;
+    rdfs:label "Privacy-by-design" .
+
+rc:SecurityByDesign a rc:DesignPrinciple ;
+    rdfs:label "Security-by-design" .
+
+########################
+# Individual: civil compliance PROFILE for this use case
+########################
+
+rc:Baseline_CivilCompliance a rc:RegComplyforCivilUse ;
+    rdfs:label "Baseline civil regulatory compliance profile" ;
+    rc:hasRequirementGroup rc:Baseline_DesignAndDevelopmentRequirements ,
+                           rc:Baseline_UsageAndMaintenanceRequirements .
+
+########################
+# Individuals: requirement groups
+########################
+
+rc:Baseline_DesignAndDevelopmentRequirements a rc:RequirementGroup ;
+    rdfs:label "Baseline requirements for design and development phases (civilian domain)" ;
+    rc:appliesToPhase rc:DesignAndDevelopmentPhase ;
+    rc:hasRequirement rc:Baseline_R1 , rc:Baseline_R2 .
+
+rc:Baseline_UsageAndMaintenanceRequirements a rc:RequirementGroup ;
+    rdfs:label "Baseline requirements for usage and maintenance phases (civilian domain)" ;
+    rc:appliesToPhase rc:UsageAndMaintenancePhase ;
+    rc:hasRequirement rc:Baseline_R3 , rc:Baseline_R4 .
+
+########################
+# Individuals: example requirements
+########################
+
+rc:Baseline_R1 a rc:PrivacyRequirement ;
+    rdfs:label "Baseline privacy requirement in design & development (civilian)" ;
+    rc:guidedByPrinciple rc:PrivacyByDesign .
+
+rc:Baseline_R2 a rc:SecurityRequirement ;
+    rdfs:label "Baseline security requirement in design & development (civilian)" ;
+    rc:guidedByPrinciple rc:SecurityByDesign .
+
+rc:Baseline_R3 a rc:PrivacyRequirement ;
+    rdfs:label "Baseline privacy requirement in usage & maintenance (civilian)" ;
+    rc:guidedByPrinciple rc:PrivacyByDesign .
+
+rc:Baseline_R4 a rc:SecurityRequirement ;
+    rdfs:label "Baseline security requirement in usage & maintenance (civilian)" ;
+    rc:guidedByPrinciple rc:SecurityByDesign .
