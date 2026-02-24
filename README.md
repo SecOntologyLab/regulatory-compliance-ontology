@@ -105,6 +105,8 @@ Open the HTML files in `/visualisations/` in any modern browser.
 
 This research was prepared as part of the project "Implementation of Mission-Based Science and Innovation Programs" (Project No. 02-002-P-0001), financed by the European Union through the Recovery and Resilience Facility (2021–2027 programming period, New Generation Lithuania plan), and co-funded by the state budget of the Republic of Lithuania administered via the Research Council of Lithuania (Lietuvos Mokslo Taryba).
 
-## License
+## Licensing
 
-This work is licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). See the [LICENSE](LICENSE) file for details.
+Ontology and data files are licensed under CC-BY 4.0. 
+Software (SPARQL queries, D3.js visualisations) is licensed under the MIT License. 
+See LICENSE-CC-BY-4.0.txt and LICENSE-MIT.txt for full terms.
