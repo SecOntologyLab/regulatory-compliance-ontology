@@ -109,4 +109,4 @@ This research was prepared as part of the project "Implementation of Mission-Bas
 
 Ontology and data files are licensed under CC-BY 4.0. 
 Software (SPARQL queries, D3.js visualisations) is licensed under the MIT License. 
-See LICENSE-CC-BY-4.0.txt and LICENSE-MIT.txt for full terms.
+See [LICENSE-CC-BY-4.0.txt](LICENSE-CC-BY-4.0.txt) and [LICENSE-MIT.txt](LICENSE-MIT.txt) for full terms.
