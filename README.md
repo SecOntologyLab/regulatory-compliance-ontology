@@ -8,7 +8,7 @@ This repository contains the **research artefacts** and **validation materials**
 
 ## Publication
 
-**Sabaliauskaitė, G., Paskauskas, R. A., Bružė, E., Matulytė, R., & Lavišius, T.** (2026). Automated Regulatory Compliance for AI Systems in Security Domain: From the EU AI Act to Dual-Use Deployment Contexts. *Open Research Europe* (forthcoming).
+**Sabaliauskaitė, G., Paskauskas, R. A., Bružė, E., Matulytė, R., & Lavišius, T.** (2026). Automated Regulatory Compliance for AI Systems in the Security Domain: From the EU AI Act to Dual-Use Deployment Contexts. *Open Research Europe* (forthcoming).
 
 ## Repository Contents
 
